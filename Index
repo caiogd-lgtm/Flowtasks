@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestão Nevvo – OKR, Prioridades, Kanban & Delegação</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --bg-softer: #020617;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.15);
+      --accent-strong: #16a34a;
+      --danger: #ef4444;
+      --warning: #f97316;
+      --border: #1f2937;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --text-soft: #6b7280;
+      --card-bg: #020617;
+      --radius-lg: 14px;
+      --radius-sm: 8px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.65);
+      --shadow-subtle: 0 10px 30px rgba(15, 23, 42, 0.8);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #111827, #020617 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 18px 18px 10px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+      background: linear-gradient(
+        120deg,
+        rgba(34, 197, 94, 0.12),
+        transparent 45%
+      );
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      justify-content: space-between;
+    }
+
+    .title-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #bbf7d0, #22c55e);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25),
+        0 12px 30px rgba(34, 197, 94, 0.45);
+      position: relative;
+    }
+
+    .logo-dot::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: inherit;
+      border: 2px solid rgba(15, 23, 42, 0.85);
+    }
+
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .header-title span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 4px;
+      border-radius: 999px;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .nav button {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.16s ease;
+      white-space: nowrap;
+    }
+
+    .nav button span.badge {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      padding: 1px 7px;
+      font-size: 0.7rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+    }
+
+    .nav button:hover {
+      background: rgba(31, 41, 55, 0.95);
+      color: var(--text-main);
+      transform: translateY(-1px);
+    }
+
+    .nav button.active {
+      background: var(--accent);
+      color: #022c22;
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.6);
+      font-weight: 600;
+    }
+
+    .nav button.active span.badge {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(15, 23, 42, 0.95);
+      color: #bbf7d0;
+    }
+
+    main {
+      flex: 1;
+      padding: 18px;
+    }
+
+    .main-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hint-bar {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 10px 12px;
+      border: 1px dashed rgba(55, 65, 81, 0.9);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hint-pill {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      color: var(--text-muted);
+    }
+
+    section {
+      display: none;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    @media (min-width: 900px) {
+      .grid-2 {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      }
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #020617, #020617);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      box-shadow: var(--shadow-soft);
+      padding: 14px 14px 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at top right,
+        rgba(34, 197, 94, 0.24),
+        transparent 55%
+      );
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0;
+      font-size: 0.92rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+    }
+
+    .card-subtitle {
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.95);
+      white-space: nowrap;
+    }
+
+    .pill-okr {
+      border-color: rgba(34, 197, 94, 0.6);
+      color: #bbf7d0;
+      background: rgba(21, 128, 61, 0.2);
+    }
+
+    .pill-danger {
+      border-color: rgba(239, 68, 68, 0.6);
+      color: #fecaca;
+      background: rgba(127, 29, 29, 0.3);
+    }
+
+    .pill-warn {
+      border-color: rgba(249, 115, 22, 0.7);
+      color: #fed7aa;
+      background: rgba(124, 45, 18, 0.4);
+    }
+
+    form {
+      display: grid;
+      gap: 8px;
+      font-size: 0.82rem;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-main);
+      padding: 7px 9px;
+      font: inherit;
+      resize: vertical;
+      min-height: 32px;
+    }
+
+    textarea {
+      min-height: 52px;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--text-soft);
+    }
+
+    button.primary {
+      margin-top: 2px;
+      border-radius: 999px;
+      border: none;
+      padding: 7px 13px;
+      background: linear-gradient(
+        135deg,
+        var(--accent),
+        var(--accent-strong)
+      );
+      color: #022c22;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      align-self: flex-start;
+      box-shadow: 0 12px 30px rgba(34, 197, 94, 0.65);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.15s ease;
+    }
+
+    button.primary:hover {
+      transform: translateY(-1px) scale(1.01);
+      box-shadow: 0 16px 40px rgba(34, 197, 94, 0.8);
+    }
+
+    button.primary:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 22px rgba(34, 197, 94, 0.7);
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      padding: 4px 9px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(31, 41, 55, 0.95);
+      color: var(--text-main);
+    }
+
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .section-title-row h2 {
+      margin: 0;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .section-title-row span {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      color: var(--text-muted);
+    }
+
+    .tag.area {
+      border-color: rgba(59, 130, 246, 0.7);
+      color: #bfdbfe;
+      background: rgba(30, 64, 175, 0.45);
+    }
+
+    .tag.eisenhower {
+      border-color: rgba(34, 197, 94, 0.65);
+      color: #bbf7d0;
+      background: rgba(21, 128, 61, 0.2);
+    }
+
+    .tag.status {
+      border-color: rgba(148, 163, 184, 0.8);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .tag.owner {
+      border-color: rgba(248, 250, 252, 0.5);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .tag.kpi {
+      border-color: rgba(56, 189, 248, 0.8);
+      color: #e0f2fe;
+      background: rgba(12, 74, 110, 0.7);
+    }
+
+    .list {
+      margin-top: 8px;
+      max-height: 260px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .okr-item {
+      border-radius: 10px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      padding: 8px 9px;
+      margin-bottom: 6px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .okr-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .okr-header strong {
+      font-size: 0.8rem;
+    }
+
+    .okr-krs {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-top: 4px;
+      padding-left: 10px;
+    }
+
+    .okr-krs li {
+      margin-bottom: 4px;
+    }
+
+    .table-like {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .table-like thead {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, 0.98);
+      z-index: 1;
+    }
+
+    .table-like th,
+    .table-like td {
+      padding: 6px 6px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.95);
+      text-align: left;
+    }
+
+    .table-like th {
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .table-like td {
+      color: var(--text-main);
+      vertical-align: top;
+    }
+
+    .badge-impact {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .badge-impact.high {
+      border-color: rgba(34, 197, 94, 0.7);
+      color: #bbf7d0;
+      background: rgba(21, 128, 61, 0.25);
+    }
+
+    .badge-impact.medium {
+      border-color: rgba(234, 179, 8, 0.8);
+      color: #fef9c3;
+      background: rgba(133, 77, 14, 0.5);
+    }
+
+    .badge-impact.low {
+      border-color: rgba(148, 163, 184, 0.9);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .kanban {
+      display: grid;
+      gap: 10px;
+    }
+
+    @media (min-width: 950px) {
+      .kanban {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    .kanban-column {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      padding: 8px 8px 6px;
+      display: flex;
+      flex-direction: column;
+      max-height: 380px;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .kanban-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .kanban-header h3 {
+      margin: 0;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .kanban-header span {
+      font-size: 0.72rem;
+      color: var(--text-soft);
+    }
+
+    .kanban-list {
+      overflow: auto;
+      padding-right: 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .task-card {
+      background: #020617;
+      border-radius: 9px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      padding: 6px 6px;
+      font-size: 0.76rem;
+    }
+
+    .task-title {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .task-meta {
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      margin-bottom: 3px;
+    }
+
+    .task-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 3px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .task-footer-left {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .task-move {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 2px 6px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-muted);
+    }
+
+    .people-list {
+      margin-top: 8px;
+      max-height: 280px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .person-card {
+      border-radius: 10px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      padding: 7px 8px;
+      background: rgba(15, 23, 42, 0.95);
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+
+    .person-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .person-header strong {
+      font-size: 0.84rem;
+    }
+
+    .person-body {
+      font-size: 0.76rem;
+      color: var(--text-soft);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(22, 163, 74, 0.98);
+      color: #052e16;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      box-shadow: 0 12px 32px rgba(22, 163, 74, 0.7);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: 0.2s ease;
+      z-index: 60;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .muted {
+      color: var(--text-soft);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="title-block">
+        <div class="logo-dot"></div>
+        <div class="header-title">
+          <h1>NEVVO – Sistema de Gestão de Operação</h1>
+          <span>OKR • Prioridades • Execução diária • Delegação</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Seções principais">
+        <button class="active" data-section="okr-section">
+          OKR Trimestre
+          <span class="badge">Direção</span>
+        </button>
+        <button data-section="prioridades-section">
+          Prioridades Semana
+          <span class="badge">Impacto &amp; RICE</span>
+        </button>
+        <button data-section="execucao-section">
+          Execução Diária
+          <span class="badge">Kanban + Eisenhower</span>
+        </button>
+        <button data-section="delegacao-section">
+          Delegação
+          <span class="badge">Time</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="main-inner">
+      <div class="hint-bar">
+        <span class="hint-pill">Fluxo</span>
+        <span>Trimestre: define OKRs → Semana: prioriza projetos → Dia: Kanban + Eisenhower → 1:1: ajusta níveis de delegação.</span>
+      </div>
+
+      <!-- 1) OKR -->
+      <section id="okr-section" class="active">
+        <div class="section-title-row">
+          <h2>OKR Trimestral</h2>
+          <span>GPS da operação – tudo precisa puxar um KR.</span>
+        </div>
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-inner">
+              <div class="card-title-row">
+                <h3>Definir Objetivos</h3>
+                <span class="pill pill-okr">Trimestre / Célula</span>
+              </div>
+              <p class="card-subtitle">
+                Comece pelo objetivo e depois conecte KRs – ex.: margem, reclamações, despacho mesmo dia.
+              </p>
+              <form id="okrForm">
+                <label>
+                  Objetivo (O)
+                  <input type="text" id="okrObjective" placeholder="Ex.: Tornar a operação nos marketplaces mais lucrativa e previsível" required />
+                </label>
+                <label>
+                  Período / Trimestre
+                  <input type="text" id="okrQuarter" placeholder="Ex.: 2026 Q1" />
+                </label>
+                <label>
+                  Dono do OKR
+                  <input type="text" id="okrOwner" placeholder="Ex.: Caio / Célula Marketplaces" />
+                </label>
+                <button type="submit" class="primary">
+                  + Adicionar OKR
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-inner">
+              <div class="card-title-row">
+                <h3>Adicionar KRs</h3>
+                <span class="pill">Resultados-chave</span>
+              </div>
+              <p class="card-subtitle">
+                Exemplos: aumentar margem, reduzir reclamações, elevar despacho no mesmo dia.
+              </p>
+              <form id="krForm">
+                <label>
+                  OKR
+                  <select id="okrSelectForKr" required>
+                    <option value="">Selecione um OKR…</option>
+                  </select>
+                </label>
+                <label>
+                  Descrição do KR
+                  <input type="text" id="krDescription" placeholder="Ex.: Aumentar margem líquida de 18% para 23%" required />
+                </label>
+                <label>
+                  Base atual (opcional)
+                  <input type="text" id="krBaseline" placeholder="Ex.: 18%" />
+                </label>
+                <label>
+                  Meta alvo (opcional)
+                  <input type="text" id="krTarget" placeholder="Ex.: 23%" />
+                </label>
+                <button type="submit" class="primary">
+                  + Adicionar KR
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 6px;">
+          <div class="card-inner">
+            <div class="card-title-row">
+              <h3>OKRs Ativos</h3>
+              <span class="pill">Revise a cada trimestre</span>
+            </div>
+            <div id="okrList" class="list muted">
+              <p class="muted">Nenhum OKR cadastrado ainda. Comece definindo 1–3 objetivos para o trimestre.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2) Prioridades -->
+      <section id="prioridades-section">
+        <div class="section-title-row">
+          <h2>Prioridades da Semana</h2>
+          <span>Impacto x Esforço + RICE para projetos grandes.</span>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-inner">
+              <div class="card-title-row">
+                <h3>Cadastro de Projeto</h3>
+                <span class="pill">Impacto / Esforço / RICE</span>
+              </div>
+              <p class="card-subtitle">
+                Use a matriz rápida na reunião semanal e RICE 1x por mês para rankear os grandes.
+              </p>
+              <form id="projectForm">
+                <label>
+                  Nome do projeto
+                  <input type="text" id="projectName" placeholder="Ex.: Implementar macros de cálculo de margens no Mercado Livre" required />
+                </label>
+                <label>
+                  Descrição breve
+                  <textarea id="projectDescription" placeholder="Contexto, dor que resolve, qual indicador pretende mexer…"></textarea>
+                </label>
+                <label>
+                  OKR / KR relacionado (opcional)
+                  <select id="projectKrSelect">
+                    <option value="">Conectar a um KR…</option>
+                  </select>
+                </label>
+
+                <div class="grid" style="grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap: 6px;">
+                  <label>
+                    Impacto no negócio
+                    <select id="projectImpact">
+                      <option value="alto">Alto</option>
+                      <option value="medio">Médio</option>
+                      <option value="baixo">Baixo</option>
+                    </select>
+                  </label>
+                  <label>
+                    Esforço
+                    <select id="projectEffort">
+                      <option value="baixo">Baixo</option>
+                      <option value="medio">Médio</option>
+                      <option value="alto">Alto</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="grid" style="grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); gap: 6px;">
+                  <label>
+                    Reach (alcance / mês)
+                    <input type="number" id="projectReach" min="0" step="1" placeholder="Ex.: 400" />
+                  </label>
+                  <label>
+                    Impact (1–5)
+                    <input type="number" id="projectRiceImpact" min="0" max="5" step="0.5" placeholder="Ex.: 4" />
+                  </label>
+                  <label>
+                    Confidence (0,5 / 0,8 / 1)
+                    <input type="number" id="projectConfidence" min="0" max="1" step="0.1" placeholder="Ex.: 0.8" />
+                  </label>
+                  <label>
+                    Effort (pessoa-semanas)
+                    <input type="number" id="projectRiceEffort" min="0" step="0.1" placeholder="Ex.: 1.5" />
+                  </label>
+                </div>
+
+                <button type="submit" class="primary">
+                  + Adicionar Projeto
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-inner">
+              <div class="card-title-row">
+                <h3>Guia rápido de leitura</h3>
+                <span class="pill">Impacto x Esforço</span>
+              </div>
+              <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem; color: var(--text-soft);">
+                <li><strong>Alto impacto / Baixo esforço</strong> → Quick wins: entram primeiro na semana.</li>
+                <li><strong>Alto impacto / Alto esforço</strong> → Projetos estratégicos: planejar e quebrar em entregas menores.</li>
+                <li><strong>Baixo impacto / Baixo esforço</strong> → Só entram se sobrar capacidade.</li>
+                <li><strong>Baixo impacto / Alto esforço</strong> → Questionar forte, eliminar ou adiar.</li>
+              </ul>
+              <p style="margin: 8px 0 0; font-size: 0.8rem; color: var(--text-soft);">
+                <strong>Score RICE</strong> = (Reach × Impact × Confidence) ÷ Effort.<br />
+                Quanto maior, mais prioridade.
+              </p>
+              <p style="margin: 8px 0 0; font-size: 0.78rem; color: var(--text-muted);">
+                Use esse quadro na <strong>reunião semanal (30–60 min)</strong> para escolher o “Top 3” por área: SAC, Marketplaces, Cadastro, Design/Social, Expedição.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 6px;">
+          <div class="card-inner">
+            <div class="card-title-row">
+              <h3>Projetos Priorizados</h3>
+              <span class="pill">Ordenados por RICE (desc)</span>
+            </div>
+            <div class="list" id="projectList">
+              <p class="muted">Nenhum projeto cadastrado ainda. Use o formulário para começar.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3) Execução diária -->
+      <section id="execucao-section">
+        <div class="section-title-row">
+          <h2>Execução Diária</h2>
+          <span>Kanban único + Eisenhower para decidir o que você faz e o que delega.</span>
+        </div>
+
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-title-row">
+              <h3>Novo item no Kanban</h3>
+              <span class="pill">Tarefa / Demanda</span>
+            </div>
+            <p class="card-subtitle">
+              Cadastre tarefas ligadas a projetos/OKRs e marque importância/urgência para aplicar Eisenhower.
+            </p>
+            <form id="taskForm">
+              <label>
+                Título da tarefa
+                <input type="text" id="taskTitle" placeholder="Ex.: Configurar respostas padrão no SAC Mercado Livre" required />
+              </label>
+              <label>
+                Descrição
+                <textarea id="taskDescription" placeholder="O que precisa ser feito, contexto, anexos que serão usados…"></textarea>
+              </label>
+
+              <div class="grid" style="grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 6px;">
+                <label>
+                  Dono (responsável)
+                  <input type="text" id="taskOwner" placeholder="Ex.: Patrícia / Vivien" />
+                </label>
+                <label>
+                  Área
+                  <select id="taskArea">
+                    <option value="SAC">SAC</option>
+                    <option value="Marketplaces">Marketplaces</option>
+                    <option value="Cadastro">Cadastro</option>
+                    <option value="Design/Social">Design/Social</option>
+                    <option value="Expedição">Expedição</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </label>
+                <label>
+                  Prazo
+                  <input type="date" id="taskDeadline" />
+                </label>
+              </div>
+
+              <div class="grid" style="grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 6px;">
+                <label>
+                  Importância
+                  <select id="taskImportant">
+                    <option value="sim">Importante</option>
+                    <option value="nao">Não importante</option>
+                  </select>
+                </label>
+                <label>
+                  Urgência
+                  <select id="taskUrgent">
+                    <option value="sim">Urgente</option>
+                    <option value="nao">Não urgente</option>
+                  </select>
+                </label>
+                <label>
+                  Projeto (opcional)
+                  <select id="taskProjectSelect">
+                    <option value="">Sem projeto associado…</option>
+                  </select>
+                </label>
+                <label>
+                  Coluna inicial
+                  <select id="taskInitialStatus">
+                    <option value="backlog">Backlog</option>
+                    <option value="week">Esta semana</option>
+                    <option value="doing">Em andamento</option>
+                  </select>
+                </label>
+              </div>
+
+              <button type="submit" class="primary">
+                + Adicionar ao Kanban
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="kanban" style="margin-top: 10px;">
+          <div class="kanban-column">
+            <div class="kanban-header">
+              <h3>Backlog</h3>
+              <span>Ideias / não priorizado</span>
+            </div>
+            <div class="kanban-list" id="col-backlog"></div>
+          </div>
+
+          <div class="kanban-column">
+            <div class="kanban-header">
+              <h3>Esta semana</h3>
+              <span>Pull da reunião semanal</span>
+            </div>
+            <div class="kanban-list" id="col-week"></div>
+          </div>
+
+          <div class="kanban-column">
+            <div class="kanban-header">
+              <h3>Em andamento</h3>
+              <span>Foco do dia</span>
+            </div>
+            <div class="kanban-list" id="col-doing"></div>
+          </div>
+
+          <div class="kanban-column">
+            <div class="kanban-header">
+              <h3>Aguardando terceiros</h3>
+              <span>Cliente / fornecedor / marketplace</span>
+            </div>
+            <div class="kanban-list" id="col-waiting"></div>
+          </div>
+
+          <div class="kanban-column">
+            <div class="kanban-header">
+              <h3>Concluído</h3>
+              <span>Pronto / entregue</span>
+            </div>
+            <div class="kanban-list" id="col-done"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4) Delegação -->
+      <section id="delegacao-section">
+        <div class="section-title-row">
+          <h2>Delegação & Níveis de Autonomia</h2>
+          <span>Para você não ser o gargalo.</span>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-inner">
+              <div class="card-title-row">
+                <h3>Cadastrar pessoa / nível</h3>
+                <span class="pill">1 a 4</span>
+              </div>
+              <p class="card-subtitle">
+                Combine por área/assunto: SAC, Marketplace, Cadastro, etc. E evolua o nível conforme a pessoa entrega.
+              </p>
+              <form id="personForm">
+                <label>
+                  Nome
+                  <input type="text" id="personName" placeholder="Ex.: Patrícia" required />
+                </label>
+                <label>
+                  Função / Área
+                  <input type="text" id="personRole" placeholder="Ex.: SAC / Operações Marketplaces" />
+                </label>
+                <label>
+                  Assunto / Escopo principal
+                  <input type="text" id="personScope" placeholder="Ex.: Respostas em casos sensíveis no SAC Mercado Livre" />
+                </label>
+                <label>
+                  Nível de autonomia
+                  <select id="personLevel">
+                    <option value="1">Nível 1 – Você decide tudo e só informa depois</option>
+                    <option value="2">Nível 2 – Você decide, mas pede opinião antes</option>
+                    <option value="3">Nível 3 – A pessoa decide, mas precisa da sua aprovação</option>
+                    <option value="4">Nível 4 – A pessoa decide e só comunica depois</option>
+                  </select>
+                </label>
+                <label>
+                  Observações (opcional)
+                  <textarea id="personNotes" placeholder="Ex.: Se rodar 2–3 ciclos bem no nível 3, sobe para 4."></textarea>
+                </label>
+                <button type="submit" class="primary">
+                  + Registrar nível
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-inner">
+              <div class="card-title-row">
+                <h3>Guia de interpretação</h3>
+                <span class="pill">Níveis 1–4</span>
+              </div>
+              <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem; color: var(--text-soft);">
+                <li><strong>Nível 1:</strong> você decide tudo. Ex.: ordem de embalagens do dia, rotinas simples.</li>
+                <li><strong>Nível 2:</strong> você decide ouvindo a pessoa. Ex.: mudanças de texto em anúncios-chave.</li>
+                <li><strong>Nível 3:</strong> a pessoa decide, você aprova. Ex.: respostas delicadas no SAC.</li>
+                <li><strong>Nível 4:</strong> a pessoa decide e só te comunica. Ex.: priorizar fila de cadastro, dividir tarefas do time.</li>
+              </ul>
+              <p style="margin: 8px 0 0; font-size: 0.78rem; color: var(--text-muted);">
+                Use isso como pauta de <strong>1:1 a cada 15 dias</strong>:
+                revisar entregas, ver o que pode subir de nível e quais decisões ainda precisam passar por você.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 6px;">
+          <div class="card-inner">
+            <div class="card-title-row">
+              <h3>Mapa de Delegação do Time</h3>
+              <span class="pill">Evolução de autonomia</span>
+            </div>
+            <div class="people-list" id="peopleList">
+              <p class="muted">Nenhuma pessoa cadastrada ainda. Use o formulário para mapear seu time.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ---------- Estado & Persistência ----------
+    const STORAGE_KEY = "nevvo_gestao_operacao_v1";
+
+    let state = {
+      okrs: [], // {id, objective, quarter, owner, krs:[{id,description,baseline,target}]}
+      projects: [], // {id,name,description,linkedKRLabel,impact,effort,reach,riceImpact,confidence,riceEffort,riceScore}
+      tasks: [], // {id,title,description,owner,area,deadline,status,important,urgent,projectId,eisenhowerLabel}
+      people: [] // {id,name,role,scope,level,notes}
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object") {
+            state = Object.assign(state, parsed);
+          }
+        }
+      } catch (e) {
+        console.warn("Erro ao ler estado:", e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn("Erro ao salvar estado:", e);
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    // ---------- Navegação entre seções ----------
+    function initNavigation() {
+      const buttons = document.querySelectorAll(".nav button");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.getAttribute("data-section");
+          buttons.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          document.querySelectorAll("section").forEach((sec) => {
+            sec.classList.remove("active");
+          });
+          const sectionEl = document.getElementById(target);
+          if (sectionEl) sectionEl.classList.add("active");
+        });
+      });
+    }
+
+    // ---------- Renderização OKRs ----------
+    function updateOkrSelects() {
+      const okrSelectForKr = document.getElementById("okrSelectForKr");
+      const projectKrSelect = document.getElementById("projectKrSelect");
+
+      if (!okrSelectForKr || !projectKrSelect) return;
+
+      okrSelectForKr.innerHTML =
+        '<option value="">Selecione um OKR…</option>';
+      projectKrSelect.innerHTML =
+        '<option value="">Conectar a um KR…</option>';
+
+      state.okrs.forEach((okr) => {
+        const opt = document.createElement("option");
+        opt.value = okr.id;
+        opt.textContent =
+          (okr.quarter ? "[" + okr.quarter + "] " : "") + okr.objective;
+        okrSelectForKr.appendChild(opt);
+
+        // para o select de projeto, listamos os KRs
+        if (okr.krs && okr.krs.length) {
+          okr.krs.forEach((kr) => {
+            const optKr = document.createElement("option");
+            optKr.value = okr.id + "|" + kr.id;
+            optKr.textContent =
+              (okr.quarter ? "[" + okr.quarter + "] " : "") +
+              "O: " +
+              okr.objective +
+              " – KR: " +
+              kr.description;
+            projectKrSelect.appendChild(optKr);
+          });
+        }
+      });
+    }
+
+    function renderOkrs() {
+      const list = document.getElementById("okrList");
+      if (!list) return;
+
+      if (!state.okrs.length) {
+        list.innerHTML =
+          '<p class="muted">Nenhum OKR cadastrado ainda. Comece definindo 1–3 objetivos para o trimestre.</p>';
+        updateOkrSelects();
+        return;
+      }
+
+      list.innerHTML = "";
+      state.okrs.forEach((okr) => {
+        const div = document.createElement("div");
+        div.className = "okr-item";
+
+        const header = document.createElement("div");
+        header.className = "okr-header";
+
+        const left = document.createElement("div");
+        left.innerHTML =
+          '<strong>O:</strong> ' + (okr.objective || "(sem objetivo)");
+
+        const right = document.createElement("div");
+        const quarterText = okr.quarter ? okr.quarter : "Trimestre não informado";
+        const ownerText = okr.owner ? okr.owner : "Sem dono definido";
+        right.innerHTML =
+          '<span class="pill pill-okr">' +
+          quarterText +
+          "</span> " +
+          '<span class="pill">' +
+          ownerText +
+          "</span>";
+
+        header.appendChild(left);
+        header.appendChild(right);
+        div.appendChild(header);
+
+        if (okr.krs && okr.krs.length) {
+          const ul = document.createElement("ul");
+          ul.className = "okr-krs";
+          okr.krs.forEach((kr) => {
+            const li = document.createElement("li");
+            let txt = kr.description || "";
+            if (kr.baseline || kr.target) {
+              txt += " ";
+              const pieces = [];
+              if (kr.baseline) pieces.push("Base: " + kr.baseline);
+              if (kr.target) pieces.push("Meta: " + kr.target);
+              txt += "(" + pieces.join(" → ") + ")";
+            }
+            li.textContent = txt;
+            ul.appendChild(li);
+          });
+          div.appendChild(ul);
+        } else {
+          const p = document.createElement("p");
+          p.className = "okr-krs";
+          p.textContent = "Nenhum KR cadastrado ainda para este objetivo.";
+          div.appendChild(p);
+        }
+
+        list.appendChild(div);
+      });
+
+      updateOkrSelects();
+    }
+
+    // ---------- Renderização Projetos ----------
+    function impactClass(value) {
+      switch (value) {
+        case "alto":
+          return "high";
+        case "medio":
+          return "medium";
+        case "baixo":
+        default:
+          return "low";
+      }
+    }
+
+    function impactLabel(impact, effort) {
+      if (impact === "alto" && effort === "baixo") {
+        return "Quick win – Alto impacto / Baixo esforço";
+      }
+      if (impact === "alto" && effort === "alto") {
+        return "Projeto estratégico – Alto impacto / Alto esforço";
+      }
+      if (impact === "baixo" && effort === "baixo") {
+        return "Se sobrar capacidade – Baixo impacto / Baixo esforço";
+      }
+      if (impact === "baixo" && effort === "alto") {
+        return "Questionar / Eliminar – Baixo impacto / Alto esforço";
+      }
+      return "";
+    }
+
+    function renderProjects() {
+      const container = document.getElementById("projectList");
+      const taskProjectSelect = document.getElementById("taskProjectSelect");
+      if (!container || !taskProjectSelect) return;
+
+      if (!state.projects.length) {
+        container.innerHTML =
+          '<p class="muted">Nenhum projeto cadastrado ainda. Use o formulário para começar.</p>';
+        taskProjectSelect.innerHTML =
+          '<option value="">Sem projeto associado…</option>';
+        return;
+      }
+
+      // ordenar por RICE desc (se existir)
+      const projectsSorted = [...state.projects].sort((a, b) => {
+        const sa = isNaN(a.riceScore) ? 0 : a.riceScore;
+        const sb = isNaN(b.riceScore) ? 0 : b.riceScore;
+        return sb - sa;
+      });
+
+      container.innerHTML = "";
+      const table = document.createElement("table");
+      table.className = "table-like";
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Projeto</th>
+          <th>Impacto / Esforço</th>
+          <th>RICE</th>
+          <th>OKR / KR</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      projectsSorted.forEach((p) => {
+        const tr = document.createElement("tr");
+
+        const tdName = document.createElement("td");
+        tdName.innerHTML =
+          "<strong>" +
+          (p.name || "(Sem nome)") +
+          "</strong><br><span class='muted'>" +
+          (p.description || "") +
+          "</span>";
+        tr.appendChild(tdName);
+
+        const tdImpact = document.createElement("td");
+        const impactBadge = document.createElement("span");
+        impactBadge.className =
+          "badge-impact " + impactClass(p.impact || "baixo");
+        impactBadge.textContent =
+          "Impacto " + (p.impact || "não definido").toUpperCase();
+        const effortBadge = document.createElement("span");
+        effortBadge.className =
+          "badge-impact " + impactClass(p.effort || "baixo");
+        effortBadge.textContent =
+          "Esforço " + (p.effort || "não definido").toUpperCase();
+
+        const label = impactLabel(p.impact, p.effort);
+        tdImpact.appendChild(impactBadge);
+        tdImpact.appendChild(document.createTextNode(" "));
+        tdImpact.appendChild(effortBadge);
+        if (label) {
+          const pInfo = document.createElement("div");
+          pInfo.className = "muted";
+          pInfo.style.marginTop = "3px";
+          pInfo.textContent = label;
+          tdImpact.appendChild(pInfo);
+        }
+        tr.appendChild(tdImpact);
+
+        const tdRice = document.createElement("td");
+        const score = isNaN(p.riceScore) ? 0 : p.riceScore;
+        tdRice.innerHTML =
+          "<strong>" +
+          score.toFixed(1) +
+          "</strong><br><span class='muted'>R:" +
+          (p.reach || 0) +
+          " I:" +
+          (p.riceImpact || 0) +
+          " C:" +
+          (p.confidence || 0) +
+          " E:" +
+          (p.riceEffort || 0) +
+          "</span>";
+        tr.appendChild(tdRice);
+
+        const tdOkr = document.createElement("td");
+        tdOkr.innerHTML =
+          "<span class='muted'>" +
+          (p.linkedKRLabel || "Sem KR vinculado") +
+          "</span>";
+        tr.appendChild(tdOkr);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      container.appendChild(table);
+
+      // atualiza select de tarefas
+      taskProjectSelect.innerHTML =
+        '<option value="">Sem projeto associado…</option>';
+      projectsSorted.forEach((p) => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.name;
+        taskProjectSelect.appendChild(opt);
+      });
+    }
+
+    // ---------- Renderização Kanban ----------
+    function eisenhowerLabel(important, urgent) {
+      const imp = important === "sim";
+      const urg = urgent === "sim";
+
+      if (imp && urg) {
+        return "Importante & Urgente – Você resolve hoje (ou crise / bloqueio sério).";
+      }
+      if (imp && !urg) {
+        return "Importante & Não urgente – Agendar, proteger na agenda (crescimento).";
+      }
+      if (!imp && urg) {
+        return "Não importante & Urgente – Delegar para a pessoa certa imediatamente.";
+      }
+      return "Não importante & Não urgente – Manter no backlog, só entra se ganhar prioridade.";
+    }
+
+    function statusLabel(status) {
+      switch (status) {
+        case "backlog":
+          return "Backlog";
+        case "week":
+          return "Esta semana";
+        case "doing":
+          return "Em andamento";
+        case "waiting":
+          return "Aguardando terceiros";
+        case "done":
+          return "Concluído";
+        default:
+          return status;
+      }
+    }
+
+    function renderKanban() {
+      const cols = {
+        backlog: document.getElementById("col-backlog"),
+        week: document.getElementById("col-week"),
+        doing: document.getElementById("col-doing"),
+        waiting: document.getElementById("col-waiting"),
+        done: document.getElementById("col-done")
+      };
+
+      Object.values(cols).forEach((col) => {
+        if (col) col.innerHTML = "";
+      });
+
+      if (!state.tasks.length) {
+        if (cols.backlog) {
+          cols.backlog.innerHTML =
+            '<p class="muted">Nenhuma tarefa cadastrada ainda.</p>';
+        }
+        return;
+      }
+
+      state.tasks.forEach((task) => {
+        const col = cols[task.status] || cols.backlog;
+        if (!col) return;
+
+        const card = document.createElement("div");
+        card.className = "task-card";
+
+        const title = document.createElement("div");
+        title.className = "task-title";
+        title.textContent = task.title || "(Sem título)";
+        card.appendChild(title);
+
+        if (task.description) {
+          const desc = document.createElement("div");
+          desc.className = "task-meta";
+          desc.textContent = task.description;
+          card.appendChild(desc);
+        }
+
+        const metaPieces = [];
+        if (task.owner) metaPieces.push("Dono: " + task.owner);
+        if (task.deadline) metaPieces.push("Prazo: " + task.deadline);
+        if (task.area) metaPieces.push("Área: " + task.area);
+        if (metaPieces.length) {
+          const meta = document.createElement("div");
+          meta.className = "task-meta";
+          meta.textContent = metaPieces.join(" · ");
+          card.appendChild(meta);
+        }
+
+        const footer = document.createElement("div");
+        footer.className = "task-footer";
+
+        const left = document.createElement("div");
+        left.className = "task-footer-left";
+
+        const tagStatus = document.createElement("span");
+        tagStatus.className = "tag status";
+        tagStatus.textContent = statusLabel(task.status);
+        left.appendChild(tagStatus);
+
+        if (task.area) {
+          const tagArea = document.createElement("span");
+          tagArea.className = "tag area";
+          tagArea.textContent = task.area;
+          left.appendChild(tagArea);
+        }
+
+        if (task.projectId) {
+          const proj = state.projects.find((p) => p.id === task.projectId);
+          if (proj) {
+            const tagProj = document.createElement("span");
+            tagProj.className = "tag kpi";
+            tagProj.textContent = "Projeto: " + proj.name;
+            left.appendChild(tagProj);
+          }
+        }
+
+        const label = task.eisenhowerLabel || eisenhowerLabel(task.important, task.urgent);
+        if (label) {
+          const tagE = document.createElement("span");
+          tagE.className = "tag eisenhower";
+          tagE.textContent = label;
+          left.appendChild(tagE);
+        }
+
+        footer.appendChild(left);
+
+        const right = document.createElement("div");
+        const select = document.createElement("select");
+        select.className = "task-move";
+        select.setAttribute("aria-label", "Mover tarefa de coluna");
+        ["backlog", "week", "doing", "waiting", "done"].forEach((status) => {
+          const opt = document.createElement("option");
+          opt.value = status;
+          opt.textContent = statusLabel(status);
+          if (status === task.status) opt.selected = true;
+          select.appendChild(opt);
+        });
+        select.addEventListener("change", () => {
+          task.status = select.value;
+          saveState();
+          renderKanban();
+        });
+        right.appendChild(select);
+
+        footer.appendChild(right);
+        card.appendChild(footer);
+
+        col.appendChild(card);
+      });
+    }
+
+    // ---------- Renderização Delegação ----------
+    function levelLabel(level) {
+      switch (String(level)) {
+        case "1":
+          return "Nível 1 – Você decide tudo e só informa depois.";
+        case "2":
+          return "Nível 2 – Você decide, mas pede opinião antes.";
+        case "3":
+          return "Nível 3 – A pessoa decide, mas precisa da sua aprovação.";
+        case "4":
+          return "Nível 4 – A pessoa decide e só comunica depois.";
+        default:
+          return "Nível não definido.";
+      }
+    }
+
+    function renderPeople() {
+      const container = document.getElementById("peopleList");
+      if (!container) return;
+
+      if (!state.people.length) {
+        container.innerHTML =
+          '<p class="muted">Nenhuma pessoa cadastrada ainda. Use o formulário para mapear seu time.</p>';
+        return;
+      }
+
+      container.innerHTML = "";
+      state.people.forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "person-card";
+
+        const header = document.createElement("div");
+        header.className = "person-header";
+
+        const left = document.createElement("div");
+        left.innerHTML =
+          "<strong>" +
+          (p.name || "(Sem nome)") +
+          "</strong><br><span class='muted'>" +
+          (p.role || "") +
+          "</span>";
+
+        const right = document.createElement("div");
+        const tag = document.createElement("span");
+        tag.className =
+          "pill " +
+          (p.level === "4" ? "pill-okr" : p.level === "3" ? "pill-warn" : "");
+        tag.textContent = "Nível " + (p.level || "?");
+        right.appendChild(tag);
+
+        header.appendChild(left);
+        header.appendChild(right);
+
+        const body = document.createElement("div");
+        body.className = "person-body";
+        const scopeText = p.scope ? "<strong>Escopo:</strong> " + p.scope + "<br>" : "";
+        const levelText = levelLabel(p.level);
+        const notesText = p.notes ? "<br><strong>Obs.:</strong> " + p.notes : "";
+
+        body.innerHTML = scopeText + levelText + notesText;
+
+        card.appendChild(header);
+        card.appendChild(body);
+        container.appendChild(card);
+      });
+    }
+
+    // ---------- Inicialização de formulários ----------
+    function initForms() {
+      const okrForm = document.getElementById("okrForm");
+      const krForm = document.getElementById("krForm");
+      const projectForm = document.getElementById("projectForm");
+      const taskForm = document.getElementById("taskForm");
+      const personForm = document.getElementById("personForm");
+
+      if (okrForm) {
+        okrForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const objective = document.getElementById("okrObjective").value.trim();
+          const quarter = document.getElementById("okrQuarter").value.trim();
+          const owner = document.getElementById("okrOwner").value.trim();
+
+          if (!objective) return;
+
+          const okr = {
+            id: "okr-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+            objective,
+            quarter,
+            owner,
+            krs: []
+          };
+          state.okrs.push(okr);
+          saveState();
+          okrForm.reset();
+          renderOkrs();
+          showToast("OKR adicionado.");
+        });
+      }
+
+      if (krForm) {
+        krForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const okrId = document.getElementById("okrSelectForKr").value;
+          const description = document
+            .getElementById("krDescription")
+            .value.trim();
+          const baseline = document
+            .getElementById("krBaseline")
+            .value.trim();
+          const target = document.getElementById("krTarget").value.trim();
+
+          if (!okrId || !description) return;
+
+          const okr = state.okrs.find((o) => o.id === okrId);
+          if (!okr) return;
+
+          const kr = {
+            id: "kr-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+            description,
+            baseline,
+            target
+          };
+          okr.krs.push(kr);
+          saveState();
+          krForm.reset();
+          renderOkrs();
+          showToast("KR adicionado.");
+        });
+      }
+
+      if (projectForm) {
+        projectForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const name = document.getElementById("projectName").value.trim();
+          const description = document
+            .getElementById("projectDescription")
+            .value.trim();
+          const krValue = document.getElementById("projectKrSelect").value;
+          const krSelect = document.getElementById("projectKrSelect");
+          const impact = document.getElementById("projectImpact").value;
+          const effort = document.getElementById("projectEffort").value;
+
+          const reach = parseFloat(
+            document.getElementById("projectReach").value || "0"
+          );
+          const riceImpact = parseFloat(
+            document.getElementById("projectRiceImpact").value || "0"
+          );
+          const confidence = parseFloat(
+            document.getElementById("projectConfidence").value || "0"
+          );
+          const riceEffort = parseFloat(
+            document.getElementById("projectRiceEffort").value || "0"
+          );
+
+          if (!name) return;
+
+          let riceScore = 0;
+          if (riceEffort > 0 && reach > 0 && riceImpact > 0 && confidence > 0) {
+            riceScore = (reach * riceImpact * confidence) / riceEffort;
+          }
+
+          let linkedKRLabel = "";
+          if (krValue) {
+            const selectedOption =
+              krSelect.options[krSelect.selectedIndex]?.textContent || "";
+            linkedKRLabel = selectedOption;
+          }
+
+          const project = {
+            id: "proj-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+            name,
+            description,
+            linkedKRLabel,
+            impact,
+            effort,
+            reach: isNaN(reach) ? 0 : reach,
+            riceImpact: isNaN(riceImpact) ? 0 : riceImpact,
+            confidence: isNaN(confidence) ? 0 : confidence,
+            riceEffort: isNaN(riceEffort) ? 0 : riceEffort,
+            riceScore
+          };
+
+          state.projects.push(project);
+          saveState();
+          projectForm.reset();
+          renderProjects();
+          showToast("Projeto cadastrado.");
+        });
+      }
+
+      if (taskForm) {
+        taskForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const title = document.getElementById("taskTitle").value.trim();
+          const description = document
+            .getElementById("taskDescription")
+            .value.trim();
+          const owner = document.getElementById("taskOwner").value.trim();
+          const area = document.getElementById("taskArea").value;
+          const deadline = document.getElementById("taskDeadline").value;
+          const important = document.getElementById("taskImportant").value;
+          const urgent = document.getElementById("taskUrgent").value;
+          const projectId = document.getElementById("taskProjectSelect").value;
+          const initialStatus = document.getElementById("taskInitialStatus").value;
+
+          if (!title) return;
+
+          const eisenhower = eisenhowerLabel(important, urgent);
+
+          const task = {
+            id: "task-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+            title,
+            description,
+            owner,
+            area,
+            deadline,
+            status: initialStatus || "backlog",
+            important,
+            urgent,
+            projectId: projectId || "",
+            eisenhowerLabel: eisenhower
+          };
+
+          state.tasks.push(task);
+          saveState();
+          taskForm.reset();
+          renderKanban();
+          showToast("Tarefa adicionada ao Kanban.");
+        });
+      }
+
+      if (personForm) {
+        personForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const name = document.getElementById("personName").value.trim();
+          const role = document.getElementById("personRole").value.trim();
+          const scope = document.getElementById("personScope").value.trim();
+          const level = document.getElementById("personLevel").value;
+          const notes = document.getElementById("personNotes").value.trim();
+
+          if (!name) return;
+
+          const person = {
+            id: "person-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+            name,
+            role,
+            scope,
+            level,
+            notes
+          };
+
+          state.people.push(person);
+          saveState();
+          personForm.reset();
+          renderPeople();
+          showToast("Pessoa registrada no mapa de delegação.");
+        });
+      }
+    }
+
+    // ---------- Boot ----------
+    document.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      initNavigation();
+      initForms();
+      renderOkrs();
+      renderProjects();
+      renderKanban();
+      renderPeople();
+    });
+  </script>
+</body>
+</html>
